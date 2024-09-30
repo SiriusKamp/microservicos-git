@@ -1,4 +1,4 @@
-package br.com.unisales.microservicocliente.model;
+package br.com.unisales.microservicologin.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientModel {
-
-    
+public class Autenticar {
+    private String email;
+    private String senha;
 }

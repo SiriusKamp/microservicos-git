@@ -1,4 +1,4 @@
-package br.com.unisales.microservicocliente.table;
+package br.com.unisales.microservicologin.table;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Client")
-public class Client {
+@Table(name = "usuario")
+public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
@@ -33,5 +33,9 @@ public class Client {
     private String email;
     @Column(name = "senha", nullable = false, length = 10)
     private String senha;
+    @Column(name = "grupo", nullable = false, length = 15)
+    private String grupo;
+    @Column(name = "ativo", nullable = false)
+    private Integer ativo;
 
 }
