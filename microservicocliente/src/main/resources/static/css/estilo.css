@@ -1,0 +1,27 @@
+.row-background-impar {
+    background-color: #DCDCDC !important;
+}
+
+.row-background-par {
+    background-color: #ffffff !important;
+}
+
+.cor-principal-site-bordas {
+    border: var(--bs-border-width) solid var(--azul-escuro-padrao) !important;
+}
+
+.titulo-coluna-comum {
+    font-size: 12px !important;
+}
+
+.titulo-coluna-medio {
+    font-size: 10px !important;
+}
+
+.titulo-coluna-pequeno {
+    font-size: 9px !important;
+}
+
+.titulo-coluna-extra-pequeno {
+    font-size: 6px !important;
+}
