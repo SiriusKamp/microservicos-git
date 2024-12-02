@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Clientes</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Administração</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/clientes"
+                >Listagem de Clientes</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro"
+                >Cadastro de Cliente</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/produtos"
+                >Listagem de Produtos</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro-produto"
+                >Cadastro de Produto</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <h1 class="mb-4">Lista de Clientes</h1>
+      <!-- Tabela de Clientes -->
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Celular</th>
+            <th>CPF</th>
+            <th>Sexo</th>
+            <th>Data de Nascimento</th>
+            <th>Ativo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="clientes-lista"></tbody>
+      </table>
+    </div>
+
+    <!-- Modal para Editar Cliente -->
+    <div
+      class="modal fade"
+      id="modal-editar"
+      tabindex="-1"
+      aria-labelledby="modal-editar-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modal-editar-label">Editar Cliente</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form id="form-editar-cliente">
+            <div class="modal-body">
+              <input type="hidden" id="edit-id" />
+              <div class="mb-3">
+                <label for="edit-nome" class="form-label">Nome</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-nome"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="edit-email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-celular" class="form-label">Celular</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-celular"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-cpf" class="form-label">CPF</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-cpf"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-sexo" class="form-label">Sexo</label>
+                <select class="form-select" id="edit-sexo" required>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="edit-datanasc" class="form-label"
+                  >Data de Nascimento</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="edit-datanasc"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="edit-ativo" class="form-label">Ativo</label>
+                <select class="form-select" id="edit-ativo" required>
+                  <option value="1">Sim</option>
+                  <option value="0">Não</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script -->
+    <script>
+      // Função para carregar clientes
+      function carregarClientes() {
+        fetch("http://localhost:8091/clientes")
+          .then((response) => response.json())
+          .then((data) => {
+            const tabela = document.getElementById("clientes-lista");
+            tabela.innerHTML = ""; // Limpa a tabela antes de recarregar
+
+            data.forEach((cliente, index) => {
+              const linha = document.createElement("tr");
+              linha.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${cliente.nome}</td>
+              <td>${cliente.email}</td>
+              <td>${cliente.celular}</td>
+              <td>${cliente.cpf}</td>
+              <td>${cliente.sexo}</td>
+              <td>${new Date(cliente.datanasc).toLocaleDateString()}</td>
+              <td>${cliente.ativo === 1 ? "Sim" : "Não"}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="abrirModalEditar(${
+                  cliente.id
+                })">
+                  Editar
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deletarCliente(${
+                  cliente.id
+                })">
+                  Deletar
+                </button>
+              </td>
+            `;
+              tabela.appendChild(linha);
+            });
+          })
+          .catch((error) => {
+            console.error("Erro ao carregar clientes:", error);
+            alert("Erro ao carregar a lista de clientes!");
+          });
+      }
+
+      // Função para abrir o modal de edição
+      function abrirModalEditar(id) {
+        fetch(`http://localhost:8091/clientes/${id}`)
+          .then((response) => response.json())
+          .then((cliente) => {
+            document.getElementById("edit-id").value = cliente.id;
+            document.getElementById("edit-nome").value = cliente.nome;
+            document.getElementById("edit-email").value = cliente.email;
+            document.getElementById("edit-celular").value = cliente.celular;
+            document.getElementById("edit-cpf").value = cliente.cpf;
+            document.getElementById("edit-sexo").value = cliente.sexo;
+            document.getElementById("edit-datanasc").value =
+              cliente.datanasc.split("T")[0];
+            document.getElementById("edit-ativo").value = cliente.ativo;
+            const modalEditar = new bootstrap.Modal(
+              document.getElementById("modal-editar")
+            );
+            modalEditar.show();
+          })
+          .catch((error) => {
+            console.error("Erro ao carregar cliente:", error);
+            alert("Erro ao carregar informações do cliente!");
+          });
+      }
+
+      // Função para salvar alterações
+      document
+        .getElementById("form-editar-cliente")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const id = document.getElementById("edit-id").value;
+          const cliente = {
+            nome: document.getElementById("edit-nome").value,
+            email: document.getElementById("edit-email").value,
+            celular: document.getElementById("edit-celular").value,
+            cpf: document.getElementById("edit-cpf").value,
+            sexo: document.getElementById("edit-sexo").value,
+            datanasc: document.getElementById("edit-datanasc").value,
+            ativo: parseInt(document.getElementById("edit-ativo").value),
+          };
+
+          fetch(`http://localhost:8091/clientes/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(cliente),
+          })
+            .then((response) => {
+              if (response.ok) {
+                alert("Cliente atualizado com sucesso!");
+                carregarClientes(); // Recarrega a lista
+                const modalEditar = bootstrap.Modal.getInstance(
+                  document.getElementById("modal-editar")
+                );
+                modalEditar.hide();
+              } else {
+                alert("Erro ao atualizar cliente!");
+              }
+            })
+            .catch((error) => {
+              console.error("Erro ao atualizar cliente:", error);
+              alert("Erro ao atualizar cliente!");
+            });
+        });
+
+      // Função para deletar cliente
+      function deletarCliente(id) {
+        if (confirm("Tem certeza que deseja deletar este cliente?")) {
+          fetch(`http://localhost:8091/clientes/${id}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (response.ok) {
+                alert("Cliente deletado com sucesso!");
+                carregarClientes();
+              } else {
+                alert("Erro ao deletar cliente!");
+              }
+            })
+            .catch((error) => {
+              console.error("Erro ao deletar cliente:", error);
+              alert("Erro ao deletar cliente!");
+            });
+        }
+      }
+
+      // Carregar clientes ao abrir a página
+      carregarClientes();
+    </script>
+  </body>
+</html>

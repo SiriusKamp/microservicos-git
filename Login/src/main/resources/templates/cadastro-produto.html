@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Produto</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Administração</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/clientes"
+                >Listagem de Clientes</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro"
+                >Cadastro de Cliente</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/produtos"
+                >Listagem de Produtos</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro-produto"
+                >Cadastro de Produto</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Formulário de Cadastro -->
+    <div class="container mt-4">
+      <h1 class="mb-4">Cadastrar Novo Produto</h1>
+      <form id="form-cadastro" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="titulo" class="form-label">Título</label>
+          <input
+            type="text"
+            class="form-control"
+            id="titulo"
+            name="titulo"
+            placeholder="Informe o título"
+            required
+          />
+          <div class="invalid-feedback">O título é obrigatório.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="descricao" class="form-label">Descrição</label>
+          <textarea
+            class="form-control"
+            id="descricao"
+            name="descricao"
+            rows="3"
+            placeholder="Informe a descrição"
+            required
+          ></textarea>
+          <div class="invalid-feedback">A descrição é obrigatória.</div>
+        </div>
+
+        <div class="mb-3">
+          <select class="form-select" id="ativo" name="ativo" required>
+            <option value="" disabled selected>Selecione</option>
+            <option value="1">Sim</option>
+            <option value="0">Não</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+      </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Função para validar o formulário
+      document
+        .getElementById("form-cadastro")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          // Obtenção dos dados do formulário
+          const formData = new FormData(event.target);
+          const produto = {
+            titulo: formData.get("titulo"),
+            descricao: formData.get("descricao"),
+            ativo: parseInt(formData.get("ativo")),
+          };
+
+          // Verificação de campos obrigatórios
+          if (!produto.titulo || !produto.descricao) {
+            alert("Os campos Título e Descrição são obrigatórios.");
+            return;
+          }
+
+          fetch("http://localhost:8092/produtos", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(produto),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Erro ao cadastrar produto: " + response.statusText
+                );
+              }
+              return response.json();
+            })
+            .then(() => {
+              alert("Produto cadastrado com sucesso!");
+              window.location.href = "http://localhost:8090/produtos"; // Redireciona para a listagem de produtos
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        });
+
+      // Funcionalidade de validação de formulário no Bootstrap
+      (() => {
+        "use strict";
+        window.addEventListener(
+          "load",
+          () => {
+            const forms = document.querySelectorAll(".needs-validation");
+            Array.prototype.slice.call(forms).forEach((form) => {
+              form.addEventListener(
+                "submit",
+                (event) => {
+                  if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  form.classList.add("was-validated");
+                },
+                false
+              );
+            });
+          },
+          false
+        );
+      })();
+    </script>
+  </body>
+</html>

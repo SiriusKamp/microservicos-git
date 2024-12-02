@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Cliente</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Administração</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/clientes"
+                >Listagem de Clientes</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro"
+                >Cadastro de Cliente</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/produtos"
+                >Listagem de Produtos</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro-produto"
+                >Cadastro de Produto</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <h1 class="mb-4">Cadastrar Novo Cliente</h1>
+      <form id="form-cadastro" class="row g-3">
+        <!-- Nome -->
+        <div class="col-md-6">
+          <label for="nome" class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nome"
+            name="nome"
+            placeholder="Digite o nome"
+            required
+          />
+        </div>
+
+        <!-- Sexo -->
+        <div class="col-md-6">
+          <label for="sexo" class="form-label">Sexo</label>
+          <select class="form-select" id="sexo" name="sexo" required>
+            <option value="" disabled selected>Selecione o sexo</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+          </select>
+        </div>
+
+        <!-- Data de Nascimento -->
+        <div class="col-md-6">
+          <label for="datanasc" class="form-label">Data de Nascimento</label>
+          <input
+            type="date"
+            class="form-control"
+            id="datanasc"
+            name="datanasc"
+            required
+          />
+        </div>
+
+        <!-- CPF -->
+        <div class="col-md-6">
+          <label for="cpf" class="form-label">CPF</label>
+          <input
+            type="text"
+            class="form-control"
+            id="cpf"
+            name="cpf"
+            placeholder="Digite o CPF"
+            required
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Digite o email"
+            required
+          />
+        </div>
+
+        <!-- Celular -->
+        <div class="col-md-6">
+          <label for="celular" class="form-label">Celular</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="celular"
+            name="celular"
+            placeholder="Digite o número de celular"
+            required
+          />
+        </div>
+
+        <!-- Ativo -->
+        <div class="col-md-6">
+          <label for="ativo" class="form-label">Ativo</label>
+          <select class="form-select" id="ativo" name="ativo" required>
+            <option value="" disabled selected>Selecione</option>
+            <option value="1">Sim</option>
+            <option value="0">Não</option>
+          </select>
+        </div>
+
+        <!-- Botão -->
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script -->
+    <script>
+      document
+        .getElementById("form-cadastro")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+          const cliente = {
+            nome: formData.get("nome"),
+            sexo: formData.get("sexo"),
+            datanasc: formData.get("datanasc"),
+            cpf: formData.get("cpf"),
+            email: formData.get("email"),
+            celular: formData.get("celular"),
+            ativo: parseInt(formData.get("ativo")),
+          };
+
+          fetch("http://localhost:8091/clientes", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(cliente),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              alert("Cliente cadastrado com sucesso!");
+              window.location.href = "/clientes";
+            })
+            .catch((error) => {
+              alert("Erro ao cadastrar cliente!");
+              console.error(error);
+            });
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listagem de Produtos</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Administração</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/clientes"
+                >Listagem de Clientes</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro"
+                >Cadastro de Cliente</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/produtos"
+                >Listagem de Produtos</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8090/cadastro-produto"
+                >Cadastro de Produto</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Listagem de Produtos -->
+    <div class="container mt-4">
+      <h1 class="mb-4">Listagem de Produtos</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Título</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Status</th>
+            <th scope="col">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="produtos-lista">
+          <!-- Produtos serão listados aqui -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div
+      class="modal fade"
+      id="editarProdutoModal"
+      tabindex="-1"
+      aria-labelledby="editarProdutoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editarProdutoModalLabel">
+              Editar Produto
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="form-editar-produto">
+              <div class="mb-3">
+                <label for="titulo" class="form-label">Título</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="titulo"
+                  name="titulo"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="descricao"
+                  name="descricao"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                  <option value="1">Ativo</option>
+                  <option value="0">Inativo</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Salvar Alterações
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Carregar e exibir produtos
+      fetch("http://localhost:8092/produtos")
+        .then((response) => response.json())
+        .then((data) => {
+          const lista = document.getElementById("produtos-lista");
+          data.forEach((produto) => {
+            var status;
+            if (produto.ativo == 1) status = "ativo";
+            else status = "inativo";
+            const item = document.createElement("tr");
+            item.innerHTML = `
+              <td>${produto.id}</td>
+              <td>${produto.titulo}</td>
+              <td>${produto.descricao}</td>
+              <td>${status}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editarProdutoModal" onclick="editarProduto(${produto.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="deletarProduto(${produto.id})">Excluir</button>
+              </td>
+            `;
+            lista.appendChild(item);
+          });
+        })
+        .catch((error) => {
+          alert("Erro ao carregar produtos: " + error.message);
+        });
+
+      // Função para editar produto
+      function editarProduto(id) {
+        fetch(`http://localhost:8092/produtos/${id}`)
+          .then((response) => response.json())
+          .then((produto) => {
+            document.getElementById("titulo").value = produto.titulo;
+            document.getElementById("descricao").value = produto.descricao;
+            document.getElementById("status").value = produto.ativo;
+            document.getElementById("form-editar-produto").onsubmit = function (
+              event
+            ) {
+              event.preventDefault();
+              const formData = new FormData(event.target);
+              const produtoAtualizado = {
+                titulo: formData.get("titulo"),
+                descricao: formData.get("descricao"),
+                ativo: formData.get("status"),
+              };
+
+              fetch(`http://localhost:8092/produtos/${id}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(produtoAtualizado),
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error("Erro ao atualizar produto");
+                  }
+                  alert("Produto atualizado com sucesso!");
+                  window.location.reload(); // Recarregar a página para exibir a lista atualizada
+                })
+                .catch((error) => {
+                  alert(error.message);
+                });
+            };
+          })
+          .catch((error) => {
+            alert(
+              "Erro ao carregar os dados do produto para edição: " +
+                error.message
+            );
+          });
+      }
+
+      // Função para excluir produto
+      function deletarProduto(id) {
+        if (confirm("Tem certeza que deseja excluir este produto?")) {
+          fetch(`http://localhost:8092/produtos/${id}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Erro ao excluir produto: " + response.statusText
+                );
+              }
+              alert("Produto excluído com sucesso!");
+              window.location.reload(); // Recarregar a página para mostrar a lista atualizada
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        }
+      }
+    </script>
+  </body>
+</html>
